@@ -1,0 +1,77 @@
+#1.3
+50	1	7	24
+id	type	name	description	target	belongs_to	group_by	score	BRD-A64977602-summary
+cell_id	na	na	na	na	na	na	na	Summary
+_id	na	na	na	na	na	na	na	BRD-A64977602
+name	na	na	na	na	na	na	na	mirtazapine
+pert_type	na	na	na	na	na	na	na	trt_cp
+moiety	na	na	na	na	na	na	na	mirtazapine
+moa	na	na	na	na	na	na	na	Adrenergic receptor antagonist|Serotonin receptor antagonist
+gene_targets	na	na	na	na	na	na	na	ADRA2A|HTR2A|HTR2C|ADRA2C|ADRA2B|HTR3A
+gene_ids	na	na	na	na	na	na	na	150|3356|3358|152|151|3359
+inchikey	na	na	na	na	na	na	na	RONZAEMNMFQXRA-UHFFFAOYSA-N
+smiles	na	na	na	na	na	na	na	CN1CCN2C(C1)c1ccccc1Cc1cccnc21
+pubchem_cid	na	na	na	na	na	na	na	-666.00
+cell_ids	na	na	na	na	na	na	na	A375|A549|HA1E|HCC515|HEPG2|HT29|MCF7|PC3|VCAP
+pert_itimes	na	na	na	na	na	na	na	6 h
+pert_idoses	na	na	na	na	na	na	na	10 µM
+num_cell	na	na	na	na	na	na	na	9.00
+num_time	na	na	na	na	na	na	na	1.00
+num_dose	na	na	na	na	na	na	na	1.00
+tas_q75	na	na	na	na	na	na	na	0.27
+icc	na	na	na	na	na	na	na	0.42
+url	na	na	na	na	na	na	na	BRD-A64977602
+type	na	na	na	na	na	na	na	CP
+description	na	na	na	na	na	na	na	adrenergic receptor antagonist|serotonin receptor antagonist
+target	na	na	na	na	na	na	na	ADRA2A|HTR2A|HTR2C|ADRA2C|HTR3A|ADRA1A|ADRA1B|ADRA1D|ADRA2B|ADRB1|ADRB2|DRD1|DRD2|DRD3|DRD5|HRH1|HRH3|HTR2B|HTR7|OPRK1|SLC6A2|SLC6A3|SLC6A4
+is_index	na	na	na	na	na	na	na	
+BRD-A64977602	CP	mirtazapine	adrenergic receptor antagonist, serotonin receptor antagonist	ADRA2A, HTR2A, HTR2C, ADRA2C, HTR3A, ADRA1A, ADRA1B, ADRA1D, ADRA2B, ADRB1, ADRB2, DRD1, DRD2, DRD3, DRD5, HRH1, HRH3, HTR2B, HTR7, OPRK1, SLC6A2, SLC6A3, SLC6A4		1.00	99.97	99.97
+BRD-A07780951	CP	orciprenaline	adrenergic receptor agonist	ADRB2	Beta-adrenergic receptor agonist	1.00	99.96	99.96
+BRD-A50157456	CP	terbutaline	adrenergic receptor agonist	ADRB2	Beta-adrenergic receptor agonist	1.00	99.93	99.93
+BRD-A55416093	CP	colforsin	adenylyl cyclase activator, Adenylate cyclase stimulant, growth hormone receptor agonist, phosphokinase stimulant	ADCY2, ADCY5, GNAS		1.00	99.93	99.93
+BRD-A70449690	CP	forskolin	adenylyl cyclase activator, Adenylate cyclase stimulant, growth hormone receptor agonist, phosphokinase stimulant	ADCY2, ADCY5, GNAS		1.00	99.93	99.93
+BRD-A81866333	CP	CGS-21680	adenosine receptor agonist	ADORA2A, ADORA1, ADORA2B, ADORA3	Adenosine receptor agonist	1.00	99.93	99.93
+BRD-A88254928	CP	salbutamol	adrenergic receptor agonist	ADRB2, ADRB1		1.00	99.93	99.93
+BRD-A91555231	CP	norepinephrine	adrenergic receptor agonist, DNA inhibitor, free radical scavenger	ADRA1A, ADRA1B, ADRA1D, ADRA2A, ADRA2B, ADRA2C, ADRB1, ADRB3, ADRB2, DRD1, DRD5, PAH, SLC18A1, SLC18A2		1.00	99.93	99.93
+BRD-A97104540	CP	fenoterol	adrenergic receptor agonist	ADRB2, ADRB1, ADRB3	Beta-adrenergic receptor agonist	1.00	99.93	99.93
+BRD-K05737787	CP	isoeugenol	nitric oxide production inhibitor			1.00	99.93	99.93
+CGS001-55300	KD	PI4K2B	Phosphatidylinositol kinases, phosphatidylinositol 4-kinase type 2 beta			2.00	99.93	99.93
+CP_ADENOSINE_RECEPTOR_AGONIST	PCL	Adenosine receptor agonist				0.00	99.91	99.91
+CP_BETA_ADRENERGIC_RECEPTOR_AGONIST	PCL	Beta-adrenergic receptor agonist				0.00	99.86	99.86
+CGS001-5291	KD	PIK3CB	Phosphatidylinositol kinases, phosphoinositide-3-kinase, catalytic, beta polypeptide			2.00	99.71	99.71
+CGS001-10841	KD	FTCD	formiminotransferase cyclodeaminase			2.00	99.68	99.68
+ccsbBroad304_01812	OE	ZNF175	Zinc fingers, C2H2-type, zinc finger protein 175			2.00	99.65	99.65
+CGS001-4094	KD	MAF	v-maf musculoaponeurotic fibrosarcoma oncogene homolog (avian)			2.00	99.40	99.40
+CGS001-4097	KD	MAFG	v-maf musculoaponeurotic fibrosarcoma oncogene homolog G (avian)			2.00	99.33	99.33
+CGS001-22841	KD	RAB11FIP2	RAB11 family interacting protein 2 (class I)		C2 domain containing LOF	2.00	99.30	99.30
+CGS001-475	KD	ATOX1	ATX1 antioxidant protein 1 homolog (yeast)			2.00	99.30	99.30
+ccsbBroad304_05947	OE	CCNC	cyclin C			2.00	99.30	99.30
+ccsbBroad304_06789	OE	PSEN2	Presenilin, presenilin 2 (Alzheimer disease 4)			2.00	99.30	99.30
+OE_AKT_SIGNALING	PCL	Akt Signaling GOF				0.00	95.36	95.36
+KD_MCM_FAMILY	PCL	MCM family LOF				0.00	91.89	91.89
+OE_GPCR_SUBSET	PCL	GPCR Subset GOF				0.00	89.50	89.50
+OE_INTERLEUKINS	PCL	Interleukins GOF				0.00	1.88	1.88
+CP_STEROL_DEMETHYLASE_INHIBITOR	PCL	Sterol demethylase inhibitor				0.00	1.50	1.50
+KD_NKL_SUBCLASS_HOMEOBOXES_AND_PSEUDOGENES	PCL	NKL subclass homeoboxes and pseudogenes LOF				0.00	1.11	1.11
+KD_TRACE_AMINE_RECEPTORS	PCL	Trace amine receptors LOF				0.00	-1.24	-1.24
+KD_A_KINASE_ANCHORING_PROTEINS	PCL	Kinase anchoring proteins LOF				0.00	-11.09	-11.09
+BRD-K29113274	CP	ketoconazole	14-alpha demethylase inhibitor, androgen receptor ligand, aromatase inhibitor, cell wall synthesis inhibitor, cortisol synthesis inhibitor, P glycoprotein inhibitor, sterol demethylase inhibitor	AR, CYP19A1, CYP21A2, CYP2C19, CYP3A5, CYP3A7, KCNA10	Sterol demethylase inhibitor	1.00	-28.89	-28.89
+BRD-K23913458	CP	coumarin	vitamin antagonist	CA1, CA12, CA14, CA2, CA4, CA6, CA9, CYP2A6		1.00	-32.40	-32.40
+BRD-A36707673	CP	hydroxycholesterol	LXR agonist, ABC transporter expression enhancer, alpha secretase activator, beta secretase inhibitor, glutamate receptor modulator	ABCA1, NR1H2, NR1H3		1.00	-36.62	-36.62
+BRD-K32795028	CP	1-benzylimidazole	thromboxane synthase inhibitor	CYP11B1, QPCT		1.00	-41.03	-41.03
+BRD-K78838262	CP	austricine	hypolipidemic			1.00	-45.76	-45.76
+BRD-K53913732	CP	SB-408124	orexin receptor antagonist, orexin type 1 receptor antagonist	HCRTR1, HCRTR2		1.00	-53.10	-53.10
+BRD-K86003836	CP	flubendazole	acetylcholinesterase inhibitor, microtubule inhibitor, tubulin inhibitor	TUBB	Tubulin inhibitor	1.00	-53.88	-53.88
+BRD-K72264770	CP	QW-BI-011	histone lyinse methyltransferase inhibitor	EHMT2		1.00	-57.46	-57.46
+CGS001-8193	KD	DPF1	Zinc fingers, PHD-type, D4, zinc and double PHD fingers family 1			2.00	-57.46	-57.46
+CGS001-5289	KD	PIK3C3	Phosphatidylinositol 3-kinase family, phosphoinositide-3-kinase, class 3		PI3K Signaling LOF	2.00	-57.82	-57.82
+CGS001-51742	KD	ARID4B	AT rich interactive domain 4B (RBP1-like)			2.00	-57.99	-57.99
+ccsbBroad304_00406	OE	CYP1A1	Cytochrome P450s, cytochrome P450, family 1, subfamily A, polypeptide 1			2.00	-61.24	-61.24
+BRD-A49172652	CP	lansoprazole	ATPase inhibitor	ATP4A, CYP2C19, CYP3A4, CYP3A5		1.00	-61.92	-61.92
+CGS001-23212	KD	RRS1	RRS1 ribosome biogenesis regulator homolog (S. cerevisiae)			2.00	-63.69	-63.69
+CGS001-3586	KD	IL10	Interleukins and interleukin receptors, interleukin 10			2.00	-67.58	-67.58
+ccsbBroad304_03314	OE	HSD17B7	Short chain dehydrogenase/reductase superfamily / Classical SDR fold cluster 2, hydroxysteroid (17-beta) dehydrogenase 7			2.00	-70.41	-70.41
+CGS001-23200	KD	ATP11B	Phospholipid-transporting ATPases, ATPase, class VI, type 11B			2.00	-82.58	-82.58
+BRD-K55991774	CP	BAS-09104376	HIV integrase inhibitor			1.00	-85.33	-85.33
+CGS001-23401	KD	FRAT2	frequently rearranged in advanced T-cell lymphomas 2			2.00	-89.40	-89.40
+CGS001-28512	KD	NKIRAS1	NFKB inhibitor interacting Ras-like 1			2.00	-98.71	-98.71
