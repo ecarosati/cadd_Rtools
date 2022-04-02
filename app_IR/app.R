@@ -9,198 +9,188 @@ library(ggplot2)
 
 #spectra_dir <- "C:\\Users\\Emanuele\\Documents\\GithubRepositories\\cadd_Rtools\\data\\spectra"
 
-# QUESTA VA COMMENTATA QUANDO SI LANCIA LA APP
-# VA USATA SE VOGLIO LAVORARE SENZA APP
-setwd("C:/Users/Emanuele/Documents/GithubRepositories/cadd_Rtools/app_IR")
+transparent_yellow <- "rgba(255,255,51,0.5)"    # usato per fingerprint
+transparent_red <- "rgba(255,0,0,0.5)"       # usato per O-H e C=O
+transparent_blue <- "rgba(26,50,235,0.5)"       # OK: usato per N-H
+transparent_green <- "rgba(26,150,65,0.5)"
+transparent_orange <- "rgba(255,228,181,0.5)"
 
-# La directory spectra contiene dati già registrati
-spectra_dir <- "spectra"
-# print(list.files(spectra_dir))
+# wavenumber for regions of interest
+fingerprint_wn_high <- 1300
+fingerprint_wn_low <- 500
+
+OH_wn_high <- 3400
+OH_wn_low <- 3200
+
+NH_wn_high <- 3500
+NH_wn_low <- 3300
+
+CH_wn_high <- 3100
+CH_wn_low <- 2850
+
+CHalkyne_wn_high <- 3325
+CHalkyne_wn_low <- 3275
+
+CHalkene_alkane_line <- 3000
+
+CO_wn_high <- 1800
+CO_wn_low <- 1650
+
+double_bonds_high <- 1900
+double_bonds_low <- 1600
+
+triple_bonds_high <- 2260
+triple_bonds_low <- 2100
 
 
-create_df_all_spectra <- function(dir_spectra, code, nist=FALSE) {
-  
-  # primo step: estrarre dal nome del file le informazioni utili
-  # I file devono chiamarsi IR_YYYYMMDD_MOLECOLA_CLASSE
-  # Il primo campo indica il tipo di spettro
-  # Il secondo campo indica la data 
-  # Il terzo campo indica il nome della molecola
-  # Il quarto campo indica il nome della classe
-  # Tutte queste informazioni verranno inseritebin un dataframe
-  
-  if (nist) {
-    dir_spectra <- file.path(dir_spectra, "NIST")
-    idx_date <- NA
-    idx_mol <- 2
-    idx_method <- 3
-  } else {
-    dir_spectra <- file.path(dir_spectra, "LAB")
-    idx_date <- 2
-    idx_mol <- 3
-    idx_method <- 4
-  }
-  
-  all_files <- list.files(dir_spectra)
-  f_counter <- 0
-  # print(all_files)
-  for (f_file in all_files) {
-    f_name <- stringr::str_replace(string=f_file, pattern=".dx|.jdx", replacement = "")
-    print(f_name)
-    f_data <- stringr::str_split(string=f_name, pattern="_", simplify = F)[[1]] 
-    
-    # print(f_data)
-    # print(length(f_data))
-    if (f_data[1] == code) {
-      f_code <- code
-      # cat("CODE", f_code, "\n")
-      if (nist) {
-        f_date <- NA
-      } else {
-        f_date <- f_data[idx_date]
-      }
-      # cat("DATA", f_date, "\n")
-      f_mol <- f_data[idx_mol]
-      f_method <- f_data[idx_method]
-      # f_class <- f_data[5]
-      # cat("MOLECOLA", f_mol, "\n")
-      # cat("CLASSE", f_class, "\n")
-      # cat("f_counter", f_counter, "\n")
-      spectra_data <- OpenSpecy::read_jdx(file=file.path(dir_spectra, f_file))
-      # print(head(spectra_data))
-      # print(colnames(spectra_data))
-      if ('wavenumber' %in% colnames(spectra_data) && 
-          'intensity' %in% colnames(spectra_data)) {
-        
-        # I dati dovrebbero essere OK e possiamo inserirli nel dataframe
-        f_counter <- f_counter + 1
-        
-        if (f_counter == 1) {
-          full_data <- spectra_data %>% 
-            dplyr::mutate(code=f_code) %>% 
-            dplyr::mutate(date=f_date) %>% 
-            dplyr::mutate(mol=f_mol) %>% 
-            dplyr::mutate(method=f_method)
-            #dplyr::mutate(class=f_class)
-        } else {
-          single_data <- spectra_data %>% 
-            dplyr::mutate(code=f_code) %>% 
-            dplyr::mutate(date=f_date) %>% 
-            dplyr::mutate(mol=f_mol) %>% 
-            dplyr::mutate(method=f_method)
-            #dplyr::mutate(class=f_class)
-          full_data <- rbind(full_data, single_data)
-        }
-        # print(head(full_data))
-      }
-    }
-  }
-  return(full_data)
-}
+link_analisi_farmaci <- "https://corsi.units.it/fa02/modulo/analisi-farmaci-046fa-2021-pds0-2019-ord-2019-comune"
+link_analisi_medicinali <- "https://corsi.units.it/fa01/modulo/analisi-medicinali-037fa-2021-pds0-2015-ord-2015-comune"
 
-spectra_IR_lab <- create_df_all_spectra(dir_spectra="spectra", code="IR", nist=FALSE)
-spectra_IR_nist <- create_df_all_spectra(dir_spectra="spectra", code="IR", nist=TRUE)
-# spectra_UV_lab <- create_df_all_spectra(dir_spectra="spectra", code="UV", nist=FALSE)
-# spectra_UV_nist <- create_df_all_spectra(dir_spectra="spectra", code="UV", nist=TRUE)
+# AGGIUNGERE PULSANTE (CHECKBOX) CHE FISSA L'ASSE Y TRA 0 E 100
+# AGGIUNGERE POSSIBILITA IMPORTARE SPETTRO DA FILE
+# ? SPOSTARE LEGENDA SOTTO ?
+# AGGIUNGERE OPZIONE PER SUGGERIMENTI (RETTANGOLI SEMITRASPARENTI A FISSI VALORI DI X)
 
 
 
+dir_spectra <- "spectra"
 
-# read_spectra_from_file <- function(spectra_file, spectra_name, spectra_class, all_spectra_df) {
-#   # my_IR_spectra1 <- glue::glue_collapse(c(spectra_dir, spectraname1), "\\")
-#   spectra_data <- OpenSpecy::read_jdx(file=spectra_file) %>% 
-#     dplyr::mutate(sostanza=spectra_name, classe=spectra_class)
-#   
-#   if (is.null(all_spectra_df)) {
-#     all_spectra_df <- spectra_data
-#   } else {
-#     all_spectra_df %<>% dplyr::rbind(spectra_data)
-#   }
-#   return(all_spectra_df)
-# }
-# 
-# spectraname1 <- "65-85-0-IR.jdx"
-# spectraname2 <- "69-72-7-IR.jdx"
+dir_images <- file.path("www", "images")
+images_all_files <- list.files(path=dir_images)
 
 
+spectra_all_data <- readRDS(file = file.path(dir_spectra, "dataIR.R"))
 
-# glue::glue_collapse(c(spectra_dir, "69-72-7-IR.jdx"))
-
-# my_IR_spectra1 <- glue::glue_collapse(c(spectra_dir, spectraname1), "\\")
-# my_IR_data1 <- read_spectra_from_file(
-#   spectra_file = my_IR_spectra1
-# , spectra_name = "NAME_A"
-# , spectra_class = "CLASS_B"
-# , all_spectra_df = NULL
-# )
-# 
-# print(head(my_IR_data1))
-# 
-# my_IR_spectra2 <- glue::glue_collapse(c(spectra_dir, spectraname2), "\\")
-# my_IR_data12 <- read_spectra_from_file(
-#   spectra_file = my_IR_spectra2
-#   , spectra_name = "NAME_C"
-#   , spectra_class = "CLASS_B"
-#   , all_spectra_df = NULL
-# )
-
-
-
-# my_IR_data1 <- OpenSpecy::read_jdx(file=my_IR_spectra1)
-# my_IR_data2 <- OpenSpecy::read_jdx(file=my_IR_spectra2)
-
-
-# IR_spectra_dir <- "C:\\Users\\Emanuele\\Documents\\GithubRepositories\\didattica\\spettroscopia"
-# spectraname3 <- "prova procaina.dx"
-# my_IR_spectra3 <- glue::glue_collapse(c(spectra_dir, spectraname3), "\\")
-# 
-# 
-# my_IR_data3 <- OpenSpecy::read_jdx(file=my_IR_spectra3)
-
-# my_IR_data123 <- read_spectra_from_file(
-#   spectra_file = my_IR_spectra3
-#   , spectra_name = "NAME_D"
-#   , spectra_class = "CLASS_F"
-#   , all_spectra_df = NULL
-# )
-
+# print(head(spectra_all_data))
 
 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
-    # Application title
-    titlePanel("Lab Spettroscopia"),
+    fluidRow(
+      column(2, tags$img(src="logo-corsi-units.png", width="220", height="95")),
+      column(2, 
+             br(),
+             tags$a(href=link_analisi_farmaci, "Analisi dei farmaci"),
+             br(), br(),
+             tags$a(href=link_analisi_medicinali, "Analisi dei medicinali")
+             ),
+      column(width=8, h1("Spettroscopia IR"))
+    ),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-          radioButtons(
-            "spectroscopy",
-            label="Select which type of spectra",
-            choices = c("IR", "UV"),
-            selected = "IR",
-            inline = TRUE
+          fluidRow(
+            column(
+              4,
+              selectInput(
+                "source",
+                label="Source",
+                choices = c("LAB", "NIST", "ALL"),
+                selected = "LAB"
+              )
+            ),
+            column(
+              4,
+              selectInput(
+                "method",
+                label="Method",
+                choices = c("ATR", "KBR", "NUJOL", "ALL"),
+                selected = "ATR"
+              )
+            ),
+            column(
+              4,
+              selectInput(
+                "substance",
+                label="Substance",
+                choices = c("ALL", "INC", "STD", "BKG"),
+                selected = "ALL"
+              )
+            )
           ),
           selectInput(
             "main_spectra",
             label="Select the molecule of your main spectra",
             choices = c(""),
             selected = ""
+          ),
+          checkboxInput(
+            inputId = "add_ref",
+            label="Add reference",
+            value=FALSE
+          ),
+          conditionalPanel(
+            condition = "input.add_ref == true",
+            selectInput(
+              "ref_spectra",
+              label="Select the reference molecule",
+              choices = c(""),
+              selected = ""
+            )
+          ),
+          checkboxInput(
+            inputId = "interpretation",
+            label="Interpretation",
+            value=FALSE
+          ),
+          conditionalPanel(
+            condition = "input.interpretation == true",
+            checkboxGroupInput(
+              "tips",
+              label="Regions of interest",
+              choices = c("fingerprint", "O-H", "N-H", 
+                          "C-H", "C-H(alkane/alkene)", "C-H(alkyne)",
+                          "C=O", "Other double bonds", "Triple bonds")
+            )
           )
         ),
-
+        
         # Show a plot of the generated distribution
         mainPanel(
-          # poi aggiungere anche colore x background
-          # poi aggiungere anche colore x reference
-          selectInput(
-            "color",
-            label="Select colour for your plot",
-            choices = c("white", "yellow", "black", "blue", "red"),
-            selected = "white"
+          fluidRow(
+            column(
+              4,
+              selectInput(
+                "bg_color",
+                label="Select colour for background",
+                choices = c("white", "gray", "black", "yellow", "blue"),
+                selected = "white"
+              )
+            ),
+            column(
+              4,
+              selectInput(
+                "color",
+                label="Select colour for the main line",
+                choices = c("black", "blue", "red", "yellow", "white"),
+                selected = "black"
+              )
+            ),
+            column(
+              4,
+              conditionalPanel(
+                condition = "input.add_ref == true",
+                selectInput(
+                  "ref_color",
+                  label="Select colour for reference line",
+                  choices = c("black", "blue", "red", "yellow", "white"),
+                  selected = "black"
+                )
+              )
+            )
           ),
-          plotlyOutput("MyPlot1")
+          fluidRow(
+            column(8,
+              plotlyOutput("MyPlot")
+            ),
+            column(4,
+              uiOutput("MyMolname"),
+              imageOutput("MyImage")
+            )
+          )
         )
     )
 )
@@ -208,73 +198,315 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  data1 <- reactive({
-    my_IR_data1
+  data_IR_full <- reactive({
+    spectra_all_data 
   })
   
-  data2 <- reactive({
-    my_IR_data2
+  data_IR_selection <- reactive({
+    req(data_IR_full())
+    # First filter: method
+    if (input$method == "ALL") {
+      tmp_data_1 <- data_IR_full()
+    } else {
+      tmp_data_1 <- data_IR_full() %>% 
+        dplyr::filter(method==input$method)
+    }
+    # Second filter: substance
+    if (input$substance == "ALL") {
+      tmp_data_2 <- tmp_data_1
+    } else {
+      tmp_data_2 <- tmp_data_1 %>% 
+        dplyr::filter(substance==input$substance)
+    }
+    # Third filter: source
+    if (input$source == "ALL") {
+      tmp_data_3 <- tmp_data_2
+    } else {
+      tmp_data_3 <- tmp_data_2 %>% 
+        dplyr::filter(source==input$source)
+    }
+    
+    tmp_data_3
+    
   })
   
-  data3 <- reactive({
-    my_IR_data3
+  # observe({
+  #   req(data_IR_selection())
+  #   cat("data_IR_selection():\n")
+  #   print(head(data_IR_selection()))
+  #   print(dim(data_IR_selection()))
+  #   
+  #   cat("SOURCE:\n")
+  #   print(data_IR_selection() %>% dplyr::select(source) %>% dplyr::distinct())
+  #   
+  #   cat("METHOD:\n")
+  #   print(data_IR_selection() %>% dplyr::select(method) %>% dplyr::distinct())
+  #   
+  #   cat("SUBSTANCE:\n")
+  #   print(data_IR_selection() %>% dplyr::select(substance) %>% dplyr::distinct())
+  #   
+  # })
+  
+  
+  mol_selection <- reactive({
+    req(data_IR_selection)
+    data_IR_selection() %>% 
+      dplyr::arrange(source, substance, method) %>% 
+      dplyr::select(molname) %>% 
+      dplyr::distinct(molname)
   })
+  
   
   observe({
-    if (input$spectroscopy == "IR") {
-      updateSelectInput(
-        inputId = "main_spectra", 
-        choices = c("CIAO", "IR"), 
-        selected = c("CIAO")
-      )
-    } else if (input$spectroscopy == "UV") {
-      updateSelectInput(
-        inputId = "main_spectra", 
-        choices = c("CIAO", "UV"), 
-        selected = c("CIAO")
-      )
+    req(mol_selection)
+    updateSelectInput(
+      inputId = "main_spectra", 
+      choices = mol_selection(), 
+      selected = mol_selection()[1]
+    )
+    updateSelectInput(
+      inputId = "ref_spectra", 
+      choices = mol_selection(), 
+      selected = mol_selection()[1]
+    )
+    
+  })
+  
+  # Data for the main spectra
+  spectra_data <- reactive({
+    req(input$main_spectra, data_IR_selection())
+    
+    data_IR_selection() %>% 
+      dplyr::filter(molname==input$main_spectra)
+    
+  })
+  
+  spectra_molname <- reactive({
+    req(spectra_data())
+    spectra_data() %>% 
+      dplyr::select(molname) %>% 
+      dplyr::distinct(molname) %>% 
+      gsub(pattern = " (.*)", replacement = "")
+  })
+  
+
+  # Reference
+  spectra_data_ref <- reactive({
+    req(input$ref_spectra, data_IR_selection())
+    
+    data_IR_selection() %>% 
+      dplyr::filter(molname==input$ref_spectra)
+    
+  })
+  
+  # observe({
+  #   req(y_values())
+  #   cat("y_values():\n")
+  #   print(y_values())
+  # })
+  
+  
+  y_values <- reactive({
+    req(spectra_data())
+    
+    for (y_value in c(0,10,20,30,40,50,60,70,80,90,100,110)) {
+      if (y_value > max(spectra_data()$Tperc)) { 
+        mymax <- y_value 
+        break 
+      }
     }
-  })
-  # output$main_spectra 
-  
-  output$MyPlot1 <- renderPlotly({
-    plot_ly(data1(), type = 'scatter', mode = 'lines') %>%
-      add_trace(x = ~wavenumber, y = ~intensity, 
-                name = 'Benzoic acid',
-                line = list(color = 'rgba(240,236,19, 0.8)')) %>%
-      layout(yaxis = list(title = "absorbance intensity [-]"),
-             xaxis = list(title = "wavenumber [cm<sup>-1</sup>]",
-                          autorange = "reversed"),
-             plot_bgcolor = 'rgb(17,0,73)',
-             paper_bgcolor = 'rgba(0,0,0,0.5)',
-             font = list(color = '#FFFFFF'))
+    for (y_value in c(110,100,90,80,70,60,50,40,30,20,10,0)) {
+      if (y_value < min(spectra_data()$Tperc)) { 
+        mymin <- y_value 
+        break 
+      }
+    }
+    c(mymin, mymax)
   })
   
-  # output$MyPlot2 <- renderPlotly({
-  #   plot_ly(data3(), type = 'scatter', mode = 'lines') %>%
-  #     add_trace(x = ~wavenumber, y = ~intensity, 
-  #               name = 'Procaina',
-  #               line = list(color = 'rgba(240,236,19, 0.8)')) %>%
-  #     layout(yaxis = list(title = "absorbance intensity [-]"),
-  #            xaxis = list(title = "wavenumber [cm<sup>-1</sup>]",
-  #                         autorange = "reversed"),
-  #            plot_bgcolor = 'rgb(17,0,73)',
-  #            paper_bgcolor = 'rgba(0,0,0,0.5)',
-  #            font = list(color = '#FFFFFF'))
-  # })
   
-  # output$MyPlot2 <- renderPlotly({
-  #   plot_ly(data2(), type = 'scatter', mode = 'lines') %>%
-  #     add_trace(x = ~wavenumber, y = ~intensity, 
-  #               name = 'Procaina',
-  #               line = list(color = 'rgba(240,236,19, 0.8)')) %>%
-  #     layout(yaxis = list(title = "absorbance intensity [-]"),
-  #            xaxis = list(title = "wavenumber [cm<sup>-1</sup>]",
-  #                         autorange = "reversed"),
-  #            plot_bgcolor = 'rgb(17,0,73)',
-  #            paper_bgcolor = 'rgba(0,0,0,0.5)',
-  #            font = list(color = '#FFFFFF'))
-  # })
+  wanted_shapes <- reactive({
+    
+    wanted_shapes <- list()
+    shapes_counter <- 1
+    
+    if ("fingerprint" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_yellow,
+        line = list(color = transparent_yellow, opacity = 0.3),
+        x0 = fingerprint_wn_high, x1 = fingerprint_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("O-H" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_red,
+        line = list(color = transparent_red, opacity = 0.3),
+        x0 = OH_wn_high, x1 = OH_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("N-H" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_blue,
+        line = list(color = transparent_blue, opacity = 0.3),
+        x0 = NH_wn_high, x1 = NH_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("C-H" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_green,
+        line = list(color = transparent_green, opacity = 0.3),
+        x0 = CH_wn_high, x1 = CH_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("C-H(alkane/alkene)" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_green,
+        line = list(color = transparent_green, opacity = 0.3),
+        x0 = CHalkene_alkane_line-2, x1 = CHalkene_alkane_line+2, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    
+    if ("C-H(alkyne)" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_green,
+        line = list(color = transparent_green, opacity = 0.3),
+        x0 = CHalkyne_wn_high, x1 = CHalkyne_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+
+    if ("C=O" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_red,
+        line = list(color = transparent_red, opacity = 0.3),
+        x0 = CO_wn_high, x1 = CO_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("Other double bonds" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_orange,
+        line = list(color = transparent_orange, opacity = 0.3),
+        x0 = double_bonds_high, x1 = double_bonds_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("Triple bonds" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_orange,
+        line = list(color = transparent_orange, opacity = 0.3),
+        x0 = triple_bonds_high, x1 = triple_bonds_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    wanted_shapes
+    
+  })
+  
+  spectra_plot <- reactive({
+    req(input$main_spectra, spectra_data())
+    
+    spectra_plot <- plot_ly(spectra_data(), type = 'scatter', mode = 'lines') %>%
+      layout(
+        yaxis = list(title = "T%", range = y_values()),
+        xaxis = list(title = "wavenumber [cm<sup>-1</sup>]",
+                     autorange = "reversed"),
+        plot_bgcolor = input$bg_color,
+        paper_bgcolor = 'rgba(0,0,0,0.5)',
+             
+        shapes = wanted_shapes(),
+             
+        font = list(color = '#FFFFFF'),
+        legend = list(orientation = 'h', y = -0.3)
+      )
+    
+    
+    if (input$add_ref == TRUE) {
+      spectra_plot <- spectra_plot %>%
+        add_trace(data = spectra_data(),
+                  x = ~wavenumber, y = ~Tperc,
+                  name = input$main_spectra,
+                  line = list(color = input$color)) %>% 
+        add_trace(data = spectra_data_ref(),
+                  x = ~wavenumber, y = ~Tperc,
+                  name = input$ref_spectra,
+                  line = list(color = input$ref_color))
+    } else {
+      spectra_plot <- spectra_plot %>% 
+        add_trace(data = spectra_data(),
+                  x = ~wavenumber, y = ~Tperc,
+                  name = input$main_spectra,
+                  line = list(color = input$color))
+    }
+    
+    spectra_plot 
+    
+  })
+  
+  output$MyPlot <- renderPlotly({
+    spectra_plot()
+  })
+  
+  
+  output$MyMolname <- renderUI({
+    req(spectra_molname())
+    spectra_molname()
+  })
+  
+  output$MyImage <- renderImage({
+    req(spectra_molname())
+    
+    filename_png <- paste0(spectra_molname(),".png")
+    
+    if (filename_png %in% images_all_files) {
+      imagefile <- filename_png
+      image_width <- 300
+      image_height <- 300
+      
+    } else {
+      imagefile <- "Image-Not-Available.png"
+      image_width <- 300
+      image_height <- 400
+    }
+    
+    # Return a list containing the filename and alt text
+    expr = list(src = normalizePath(file.path('www', 'images', imagefile)), 
+                width = image_width, height = image_height,
+                alt = "Image")
+    
+    }, deleteFile = FALSE
+  )
   
 }
 
