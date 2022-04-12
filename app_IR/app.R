@@ -361,12 +361,12 @@ server <- function(input, output) {
     
   })
   
-  observe({
-    req(spectra_data())
-    cat("spectra_data():\n")
-    print(head(spectra_data()))
-    print(max(spectra_data()$Tperc))
-  })
+  # observe({
+  #   req(spectra_data())
+  #   cat("spectra_data():\n")
+  #   print(head(spectra_data()))
+  #   print(max(spectra_data()$Tperc))
+  # })
   
   
   y_values <- reactive({
