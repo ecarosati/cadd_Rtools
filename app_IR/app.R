@@ -36,6 +36,9 @@ CHalkene_alkane_line <- 3000
 CO_wn_high <- 1800
 CO_wn_low <- 1650
 
+CN_wn_high <- 1450
+CN_wn_low <- 1550
+
 double_bonds_high <- 1900
 double_bonds_low <- 1600
 
@@ -163,7 +166,7 @@ ui <- fluidPage(
               label="Regions of interest",
               choices = c("fingerprint", "O-H", "N-H", 
                           "C-H", "C-H(alkane/alkene)", "C-H(alkyne)",
-                          "C=O", "Other double bonds", "Triple bonds")
+                          "C=O", "C=N(conjugated)", "Other double bonds", "Triple bonds")
             )
           )
         ),
@@ -358,23 +361,24 @@ server <- function(input, output) {
     
   })
   
-  # observe({
-  #   req(y_values())
-  #   cat("y_values():\n")
-  #   print(y_values())
-  # })
+  observe({
+    req(spectra_data())
+    cat("spectra_data():\n")
+    print(head(spectra_data()))
+    print(max(spectra_data()$Tperc))
+  })
   
   
   y_values <- reactive({
     req(spectra_data())
     
-    for (y_value in c(0,10,20,30,40,50,60,70,80,90,100,110)) {
+    for (y_value in c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160)) {
       if (y_value > max(spectra_data()$Tperc)) { 
         mymax <- y_value 
         break 
       }
     }
-    for (y_value in c(110,100,90,80,70,60,50,40,30,20,10,0)) {
+    for (y_value in c(160,150,140,130,120,110,100,90,80,70,60,50,40,30,20,10,0)) {
       if (y_value < min(spectra_data()$Tperc)) { 
         mymin <- y_value 
         break 
@@ -462,6 +466,17 @@ server <- function(input, output) {
         fillcolor = transparent_red,
         line = list(color = transparent_red, opacity = 0.3),
         x0 = CO_wn_high, x1 = CO_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("C=N(conjugated)" %in% input$tips) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_blue,
+        line = list(color = transparent_blue, opacity = 0.3),
+        x0 = CN_wn_high, x1 = CN_wn_low, xref = "x",
         y0 = y_values()[1], y1 = y_values()[2], yref = "y"
       )
       shapes_counter <- shapes_counter + 1
