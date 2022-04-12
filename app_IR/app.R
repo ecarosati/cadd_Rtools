@@ -112,10 +112,30 @@ ui <- fluidPage(
             )
           ),
           selectInput(
-            "main_spectra",
-            label="Select the molecule of your main spectra",
-            choices = c(""),
-            selected = ""
+            "inputdata",
+            label="Data from file (.dx) or database",
+            choices = c("Database", "File"),
+            selected = "Database"
+          ),
+          
+          conditionalPanel(
+            condition = "input.inputdata == 'Database'",
+            selectInput(
+              "main_spectra",
+              label="Select the molecule of your main spectra",
+              choices = c(""),
+              selected = ""
+            )
+          ),
+          conditionalPanel(
+            condition = "input.inputdata == 'File'",
+            fileInput(
+              "userfile",
+              label="Upload your (.dx) file",
+              buttonLabel = "Upload file",
+              placeholder = "Load your .dx file",
+              accept = c(".dx")
+            )
           ),
           checkboxInput(
             inputId = "add_ref",
@@ -272,14 +292,14 @@ server <- function(input, output) {
     
   })
   
-  # Data for the main spectra
-  spectra_data <- reactive({
-    req(input$main_spectra, data_IR_selection())
-    
-    data_IR_selection() %>% 
-      dplyr::filter(molname==input$main_spectra)
-    
-  })
+  # # Data for the main spectra
+  # spectra_data <- reactive({
+  #   req(input$main_spectra, data_IR_selection())
+  #   
+  #   data_IR_selection() %>% 
+  #     dplyr::filter(molname==input$main_spectra)
+  #   
+  # })
   
   spectra_molname <- reactive({
     req(spectra_data())
@@ -290,6 +310,45 @@ server <- function(input, output) {
   })
   
 
+  # Data from file
+  # observe({
+  #   if (input$inputdata == 'File') {
+  #     print("BISOGNA LEGGERE IL FILE")
+  #     
+  #     file <- input$userfile
+  # 
+  #     req(file)
+  #     spectra_data_user <- OpenSpecy::read_jdx(file=file$datapath)
+  #     # print(head(spectra_data_user))
+  #     
+  #   }
+  #   
+  # })
+  
+  spectra_data <- reactive({
+    if (input$inputdata == 'File') {
+
+      # print("LEGGO LO SPETTRO DAL FILE DELL'UTENTE")
+      
+      file <- input$userfile
+      
+      req(file)
+      spectra_data_user <- OpenSpecy::read_jdx(file=file$datapath)
+      spectra_data_user %>% 
+        dplyr::mutate(Tperc = 100 * intensity) %>% 
+        dplyr::mutate(molname="USERDATA")
+      
+    } else {
+      
+      # print("LEGGO LO SPETTRO DA DATABASE")
+      req(input$main_spectra, data_IR_selection())
+      
+      data_IR_selection() %>% 
+        dplyr::filter(molname==input$main_spectra)
+      
+    }
+    
+  })
   # Reference
   spectra_data_ref <- reactive({
     req(input$ref_spectra, data_IR_selection())
