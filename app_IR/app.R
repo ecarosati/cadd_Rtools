@@ -7,6 +7,9 @@ library(magrittr)
 library(dplyr)
 library(ggplot2)
 
+# provare a usare due reattivi per plot che viene da file e plot che viene da database
+
+
 #spectra_dir <- "C:\\Users\\Emanuele\\Documents\\GithubRepositories\\cadd_Rtools\\data\\spectra"
 
 transparent_yellow <- "rgba(255,255,51,0.5)"    # usato per fingerprint
@@ -64,8 +67,6 @@ images_all_files <- list.files(path=dir_images)
 
 spectra_all_data <- readRDS(file = file.path(dir_spectra, "dataIR.R"))
 
-# print(head(spectra_all_data))
-
 
 
 # Define UI for application that draws a histogram
@@ -110,7 +111,7 @@ ui <- fluidPage(
                 "substance",
                 label="Substance",
                 choices = c("ALL", "INC", "STD", "BKG"),
-                selected = "ALL"
+                selected = "STD"
               )
             )
           ),
@@ -274,9 +275,10 @@ server <- function(input, output) {
   mol_selection <- reactive({
     req(data_IR_selection)
     data_IR_selection() %>% 
-      dplyr::arrange(source, substance, method) %>% 
+      dplyr::arrange(source, substance, method) %>%
       dplyr::select(molname) %>% 
-      dplyr::distinct(molname)
+      dplyr::distinct(molname) %>% 
+      dplyr::arrange(molname)
   })
   
   
@@ -329,9 +331,10 @@ server <- function(input, output) {
   # })
   
   spectra_data <- reactive({
+    
     if (input$inputdata == 'File') {
 
-      # print("LEGGO LO SPETTRO DAL FILE DELL'UTENTE")
+      print("LEGGO LO SPETTRO DAL FILE DELL'UTENTE")
       
       file <- input$userfile
       
@@ -343,7 +346,8 @@ server <- function(input, output) {
       
     } else {
       
-      # print("LEGGO LO SPETTRO DA DATABASE")
+      print("LEGGO LO SPETTRO DA DATABASE")
+      
       req(input$main_spectra, data_IR_selection())
       
       data_IR_selection() %>% 
@@ -352,6 +356,7 @@ server <- function(input, output) {
     }
     
   })
+  
   # Reference
   spectra_data_ref <- reactive({
     req(input$ref_spectra, data_IR_selection())
@@ -361,12 +366,13 @@ server <- function(input, output) {
     
   })
   
-  # observe({
-  #   req(spectra_data())
-  #   cat("spectra_data():\n")
-  #   print(head(spectra_data()))
-  #   print(max(spectra_data()$Tperc))
-  # })
+  observe({
+    req(spectra_data())
+    cat("spectra_data():\n")
+    print(head(spectra_data()))
+    print(max(spectra_data()$Tperc))
+    print(dim(spectra_data()))
+  })
   
   
   y_values <- reactive({
