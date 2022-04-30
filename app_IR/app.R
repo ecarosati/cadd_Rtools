@@ -22,6 +22,8 @@ transparent_orange <- "rgba(255,228,181,0.5)"
 fingerprint_wn_high <- 1300
 fingerprint_wn_low <- 500
 
+# OH_wn_high <- 3600
+# OH_wn_low <- 3000
 OH_wn_high <- 3400
 OH_wn_low <- 3200
 
@@ -54,8 +56,6 @@ link_analisi_medicinali <- "https://corsi.units.it/fa01/modulo/analisi-medicinal
 
 # AGGIUNGERE PULSANTE (CHECKBOX) CHE FISSA L'ASSE Y TRA 0 E 100
 # AGGIUNGERE POSSIBILITA IMPORTARE SPETTRO DA FILE
-# ? SPOSTARE LEGENDA SOTTO ?
-# AGGIUNGERE OPZIONE PER SUGGERIMENTI (RETTANGOLI SEMITRASPARENTI A FISSI VALORI DI X)
 
 
 
