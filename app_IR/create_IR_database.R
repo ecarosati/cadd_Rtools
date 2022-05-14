@@ -8,18 +8,20 @@ library(dplyr)
 
 code <- "IR"
 
-setwd("C:/Users/Emanuele/Documents/GithubRepositories/cadd_Rtools/app_IR")
+setwd("C:\\Users\\Emanuele\\Documents\\GithubRepositories\\cadd_Rtools\\app_IR")
 
 dir_spectra <- file.path(getwd(), "spectra")
 output_file <- file.path(dir_spectra, "dataIR.R")
 
 # nist <- FALSE
 # dir_spectra <- file.path(dir_spectra, "LAB")
+# print(dir_spectra)
 
 read_spectra_data <- function(mydir, nist) {
   all_files <- list.files(mydir)
 
   f_counter <- 0
+  print(all_files)
   
   for (f_file in all_files) {
     f_name <- stringr::str_replace(string=f_file, pattern=".dx|.jdx", replacement = "")
@@ -35,7 +37,7 @@ read_spectra_data <- function(mydir, nist) {
     
     if (f_data[1] == code) {
       f_code <- code
-      # cat("CODE", f_code, "\n")
+      cat("CODE", f_code, "\n")
       
       if (nist) {
         f_method <- f_data[nr_data_fields]
@@ -76,7 +78,6 @@ read_spectra_data <- function(mydir, nist) {
         
         # I dati dovrebbero essere OK e possiamo inserirli nel dataframe
         f_counter <- f_counter + 1
-        
         if (f_counter == 1) {
           full_data <- spectra_data %>%
             dplyr::mutate(code=f_code) %>%
@@ -114,10 +115,10 @@ read_spectra_data <- function(mydir, nist) {
     
   }
   
-  final_data <- full_data %>% 
-    dplyr::select(code, source, date, method, substance, mol, wavenumber, intensity, Tperc) %>% 
+  final_data <- full_data %>%
+    dplyr::select(code, source, date, method, substance, mol, wavenumber, intensity, Tperc) %>%
     dplyr::mutate(molname = glue::glue("{mol} ({source}/{substance}/{method}/{date})"))
-  
+
   return(final_data)
   
 }

@@ -17,21 +17,34 @@ transparent_red <- "rgba(255,0,0,0.5)"       # usato per O-H e C=O
 transparent_blue <- "rgba(26,50,235,0.5)"       # OK: usato per N-H
 transparent_green <- "rgba(26,150,65,0.5)"
 transparent_orange <- "rgba(255,228,181,0.5)"
+transparent_violet <- "rgba(255,180,255,0.5)"
 
 # wavenumber for regions of interest
 fingerprint_wn_high <- 1300
-fingerprint_wn_low <- 500
+fingerprint_wn_low <- 600
 
-# OH_wn_high <- 3600
-# OH_wn_low <- 3000
-OH_wn_high <- 3400
-OH_wn_low <- 3200
+# OH_wn_high <- 3400
+# OH_wn_low <- 3200
+OHal_wn_high <- 3600
+OHal_wn_low <- 3200
+
+OHca_wn_high <- 3300
+OHca_wn_low <- 2500
 
 NH_wn_high <- 3500
 NH_wn_low <- 3300
 
+NHs_wn_high <- 3000
+NHs_wn_low <- 2800
+
+SH_wn_high <- 2600
+SH_wn_low <- 2550
+
 CH_wn_high <- 3100
-CH_wn_low <- 2850
+CH_wn_low <- 2840
+
+CHar_wn_high <- 3050
+CHar_wn_low <- 3010
 
 CHalkyne_wn_high <- 3325
 CHalkyne_wn_low <- 3275
@@ -41,8 +54,8 @@ CHalkene_alkane_line <- 3000
 CO_wn_high <- 1800
 CO_wn_low <- 1650
 
-CN_wn_high <- 1450
-CN_wn_low <- 1550
+CN_wn_high <- 1550
+CN_wn_low <- 1450
 
 double_bonds_high <- 1900
 double_bonds_low <- 1600
@@ -50,11 +63,26 @@ double_bonds_low <- 1600
 triple_bonds_high <- 2260
 triple_bonds_low <- 2100
 
+SO2_wn_high <- 1370
+SO2_wn_low <- 1300
+
+NO2_wn_high <- 1570
+NO2_wn_low <- 1500
+# (anche 1300-1370)
+
+CCl_wn_high <- 850
+CCl_wn_low <- 600
+
+WAT_str_high <- 3650
+WAT_str_low <- 3100
+
+WAT_ben_high <- 1710
+WAT_ben_low <- 1530
+
 
 link_analisi_farmaci <- "https://corsi.units.it/fa02/modulo/analisi-farmaci-046fa-2021-pds0-2019-ord-2019-comune"
 link_analisi_medicinali <- "https://corsi.units.it/fa01/modulo/analisi-medicinali-037fa-2021-pds0-2015-ord-2015-comune"
 
-# AGGIUNGERE PULSANTE (CHECKBOX) CHE FISSA L'ASSE Y TRA 0 E 100
 # AGGIUNGERE POSSIBILITA IMPORTARE SPETTRO DA FILE
 
 
@@ -101,7 +129,7 @@ ui <- fluidPage(
               selectInput(
                 "method",
                 label="Method",
-                choices = c("ATR", "KBR", "NUJOL", "ALL"),
+                choices = c("ATR", "KBR", "NUJOL", "LIQUID", "ALL"),
                 selected = "ATR"
               )
             ),
@@ -162,13 +190,29 @@ ui <- fluidPage(
           ),
           conditionalPanel(
             condition = "input.interpretation == true",
-            checkboxGroupInput(
-              "tips",
-              label="Regions of interest",
-              choices = c("fingerprint", "O-H", "N-H", 
-                          "C-H", "C-H(alkane/alkene)", "C-H(alkyne)",
-                          "C=O", "C=N(conjugated)", "Other double bonds", "Triple bonds")
+            fluidRow(
+              column(
+                width = 6,
+                checkboxGroupInput(
+                  "tips1",
+                  label="Regions of interest (H)",
+                  choices = c("O-H(alcohol, phenol)", "O-H(carboxilic acid)", 
+                              "Water(stretching)", "Water(bending)",
+                              "N-H", "N-H(amine salt)", "S-H",
+                              "C-H", "C-H(aromatic)", "C-H(alkene/alkane)", "C-H(alkyne)")
+                )
+              ),
+              column(
+                width = 6,
+                checkboxGroupInput(
+                  "tips2",
+                  label="Regions of interest (other)",
+                  choices = c("Fingerprint", "C=O", "C=N(conjugated)", "NO2(nitro)", 
+                              "SO2", "Other double bonds", "Triple bonds", "C-Cl")
+                )
+              )
             )
+
           )
         ),
         
@@ -334,7 +378,7 @@ server <- function(input, output) {
     
     if (input$inputdata == 'File') {
 
-      print("LEGGO LO SPETTRO DAL FILE DELL'UTENTE")
+      # print("LEGGO LO SPETTRO DAL FILE DELL'UTENTE")
       
       file <- input$userfile
       
@@ -346,7 +390,7 @@ server <- function(input, output) {
       
     } else {
       
-      print("LEGGO LO SPETTRO DA DATABASE")
+      # print("LEGGO LO SPETTRO DA DATABASE")
       
       req(input$main_spectra, data_IR_selection())
       
@@ -366,25 +410,27 @@ server <- function(input, output) {
     
   })
   
-  observe({
-    req(spectra_data())
-    cat("spectra_data():\n")
-    print(head(spectra_data()))
-    print(max(spectra_data()$Tperc))
-    print(dim(spectra_data()))
-  })
+  # observe({
+  #   req(spectra_data())
+  #   cat("spectra_data():\n")
+  #   print(head(spectra_data()))
+  #   print(max(spectra_data()$Tperc))
+  #   print(dim(spectra_data()))
+  # })
   
   
   y_values <- reactive({
     req(spectra_data())
     
-    for (y_value in c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160)) {
+    for (y_value in c(0,10,20,30,40,50,60,70,80,90,100,
+                      110,120,130,140,150,160,170,180,190,200)) {
       if (y_value > max(spectra_data()$Tperc)) { 
         mymax <- y_value 
         break 
       }
     }
-    for (y_value in c(160,150,140,130,120,110,100,90,80,70,60,50,40,30,20,10,0)) {
+    for (y_value in c(200,190,180,170,160,150,140,130,120,
+                      110,100,90,80,70,60,50,40,30,20,10,0)) {
       if (y_value < min(spectra_data()$Tperc)) { 
         mymin <- y_value 
         break 
@@ -399,7 +445,7 @@ server <- function(input, output) {
     wanted_shapes <- list()
     shapes_counter <- 1
     
-    if ("fingerprint" %in% input$tips) {
+    if ("Fingerprint" %in% input$tips2) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_yellow,
@@ -410,18 +456,51 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     } 
     
-    if ("O-H" %in% input$tips) {
+    if ("O-H(alcohol, phenol)" %in% input$tips1) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_red,
         line = list(color = transparent_red, opacity = 0.3),
-        x0 = OH_wn_high, x1 = OH_wn_low, xref = "x",
+        x0 = OHal_wn_high, x1 = OHal_wn_low, xref = "x",
         y0 = y_values()[1], y1 = y_values()[2], yref = "y"
       )
       shapes_counter <- shapes_counter + 1
     } 
     
-    if ("N-H" %in% input$tips) {
+    if ("O-H(carboxilic acid)" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_red,
+        line = list(color = transparent_red, opacity = 0.3),
+        x0 = OHca_wn_high, x1 = OHca_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("Water(stretching)" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_red,
+        line = list(color = transparent_red, opacity = 0.3),
+        x0 = WAT_str_high, x1 = WAT_str_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("Water(bending)" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_red,
+        line = list(color = transparent_red, opacity = 0.3),
+        x0 = WAT_ben_high, x1 = WAT_ben_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("N-H" %in% input$tips1) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_blue,
@@ -432,7 +511,29 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     }
     
-    if ("C-H" %in% input$tips) {
+    if ("N-H(amine salt)" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_blue,
+        line = list(color = transparent_blue, opacity = 0.3),
+        x0 = NHs_wn_high, x1 = NHs_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("S-H" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_yellow,
+        line = list(color = transparent_yellow, opacity = 0.3),
+        x0 = SH_wn_high, x1 = SH_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("C-H" %in% input$tips1) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_green,
@@ -443,7 +544,18 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     } 
     
-    if ("C-H(alkane/alkene)" %in% input$tips) {
+    if ("C-H(aromatic)" %in% input$tips1) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_green,
+        line = list(color = transparent_green, opacity = 0.3),
+        x0 = CHar_wn_high-2, x1 = CHar_wn_low+2, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    } 
+    
+    if ("C-H(alkene/alkane)" %in% input$tips1) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_green,
@@ -455,7 +567,7 @@ server <- function(input, output) {
     } 
     
     
-    if ("C-H(alkyne)" %in% input$tips) {
+    if ("C-H(alkyne)" %in% input$tips1) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_green,
@@ -466,7 +578,7 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     } 
 
-    if ("C=O" %in% input$tips) {
+    if ("C=O" %in% input$tips2) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_red,
@@ -477,7 +589,7 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     }
     
-    if ("C=N(conjugated)" %in% input$tips) {
+    if ("C=N(conjugated)" %in% input$tips2) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_blue,
@@ -487,8 +599,7 @@ server <- function(input, output) {
       )
       shapes_counter <- shapes_counter + 1
     }
-    
-    if ("Other double bonds" %in% input$tips) {
+    if ("Other double bonds" %in% input$tips2) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_orange,
@@ -499,7 +610,7 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     }
     
-    if ("Triple bonds" %in% input$tips) {
+    if ("Triple bonds" %in% input$tips2) {
       wanted_shapes[[shapes_counter]] <- list(
         type = "rect",
         fillcolor = transparent_orange,
@@ -510,6 +621,39 @@ server <- function(input, output) {
       shapes_counter <- shapes_counter + 1
     }
     
+    if ("NO2(nitro)" %in% input$tips2) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_orange,
+        line = list(color = transparent_orange, opacity = 0.3),
+        x0 = NO2_wn_high, x1 = NO2_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+    
+    if ("SO2" %in% input$tips2) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_orange,
+        line = list(color = transparent_orange, opacity = 0.3),
+        x0 = SO2_wn_high, x1 = SO2_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+
+    if ("C-Cl" %in% input$tips2) {
+      wanted_shapes[[shapes_counter]] <- list(
+        type = "rect",
+        fillcolor = transparent_violet,
+        line = list(color = transparent_violet, opacity = 0.3),
+        x0 = CCl_wn_high, x1 = CCl_wn_low, xref = "x",
+        y0 = y_values()[1], y1 = y_values()[2], yref = "y"
+      )
+      shapes_counter <- shapes_counter + 1
+    }
+
     wanted_shapes
     
   })
